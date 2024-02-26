@@ -1,0 +1,87 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Helper function to check if it's valid to place a number at position (row, col)
+bool isValid(vector<vector<char>>& board, int row, int col, char num) {
+    // Check row
+    for (int i = 0; i < 9; ++i) {
+        if (board[row][i] == num)
+            return false;
+    }
+
+    // Check column
+    for (int i = 0; i < 9; ++i) {
+        if (board[i][col] == num)
+            return false;
+    }
+
+    // Check subgrid
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = startRow; i < startRow + 3; ++i) {
+        for (int j = startCol; j < startCol + 3; ++j) {
+            if (board[i][j] == num)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+// Recursive function to solve Sudoku
+bool solveSudoku(vector<vector<char>>& board) {
+    for (int row = 0; row < 9; ++row) {
+        for (int col = 0; col < 9; ++col) {
+            if (board[row][col] == '.') {
+                for (char num = '1'; num <= '9'; ++num) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (solveSudoku(board))
+                            return true;
+                        board[row][col] = '.'; // Backtrack
+                    }
+                }
+                return false; // No valid number found
+            }
+        }
+    }
+    return true; // All cells filled
+}
+
+int main() {
+    vector<vector<char>> board = {
+        {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
+        {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+        {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+        {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+        {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+        {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+        {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+        {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+        {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
+    };
+
+    cout << "Original Sudoku:\n";
+    for (const auto& row : board) {
+        for (char cell : row) {
+            cout << cell << " ";
+        }
+        cout << endl;
+    }
+
+    if (solveSudoku(board)) {
+        cout << "\nSolved Sudoku:\n";
+        for (const auto& row : board) {
+            for (char cell : row) {
+                cout << cell << " ";
+            }
+            cout << endl;
+        }
+    } else {
+        cout << "No solution exists." << endl;
+    }
+
+    return 0;
+}
